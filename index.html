@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meine Persönliche Webseite</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --card-background: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-text {
+            flex: 1;
+            text-align: left;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+            }
+            .header-text {
+                text-align: center;
+            }
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+            padding-top: 2rem;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 2rem;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+            padding-top: 0;
+        }
+
+        p {
+            margin-bottom: 2rem;
+        }
+
+        section {
+            margin-bottom: 3rem;
+        }
+
+        section h2 {
+            margin-top: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+            }
+        }
+
+        /* Tabellenstil */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background-color: var(--card-background);
+        }
+
+        th, td {
+            padding: 1rem;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Profilbild */
+        .profile-image {
+            max-width: 300px;
+            width: 100%;
+            display: block;
+            border-radius: 8px;
+        }
+
+        figure {
+            text-align: center;
+            margin: 0;
+        }
+
+        figcaption {
+            margin-top: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        /* Galerie */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 200px;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <figure class="profile-image">
+                <img src="assets/me.jpg" alt="Profilbild" style="width: 200px; height: 200px; object-fit: cover; border-radius: 50%;">
+            </figure>
+            <div class="header-text">
+                <h1>Jule Grabis</h1>
+                <p>Geoinformatik-Studentin</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="main-content">
+                <section>
+                    <p>Willkommen auf meiner persönlichen Webseite! Ich studiere Geoinformatik und Vermessung im 5. Semester an der Hochschule Mainz.
+                        Mein Studium kombiniere ich mit der Arbeit in der Katasterverwaltung Rheinland-Pfalz – 
+                        so kann ich Theorie und Praxis direkt miteinander verbinden.</p>
+                    <p>Mich begeistert, wie digitale Karten, offene Geodaten und WebGIS dazu beitragen,
+                        unsere Welt transparenter und besser verständlich zu machen.</p>
+                </section>
+
+                <section>
+                    <h2>Mein Werdegang</h2>
+                    <table>
+                <thead>
+                    <tr>
+                        <th>Jahr</th>
+                        <th>Station</th>
+                        <th>Ort</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Oktober 2026</td>
+                        <td>Studien- und Ausbildungsabschluss</td>
+                        <td>VermKV Koblenz</td>
+                    </tr>
+        
+                    <tr>
+                        <td>Oktober 2023</td>
+                        <td>Studienstart</td>
+                        <td>HS Mainz</td>
+                    </tr>
+                    <tr>
+                        <td>September 2023</td>
+                        <td>Ausbildungsstart</td>
+                        <td>VermKV Koblenz</td>
+                    </tr>
+                    <tr>
+                        <td>Sommer 2023</td>
+                        <td>Vorpraktikum</td>
+                        <td>VermKA Mayen</td>
+                    </tr>
+                    <tr>
+                        <td>März 2023</td>
+                        <td>Abitur</td>
+                        <td>IGS Polch</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+                <section>
+                    <h2>Projekte</h2>
+            <div class="gallery">
+                <div class="card">
+                    <img src="https://images.pexels.com/photos/3861940/pexels-photo-3861940.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Geoinformatik und Vermessung">
+                    <div class="card-content">
+                        <h3>Geoinformatik & Vermessung</h3>
+                        <p><a href="https://www.hs-mainz.de/studium/studiengaenge/technik/geoinformatik-bsc-kombinierter-studiengang/uebersicht/">Dualer Studiengang an der Hochschule Mainz in Kooperation mit der Vermessungs- und Katasterverwaltung.</a></p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div id="mainz-map" class="map-container"></div>
+                    <div class="card-content">
+                        <h3>Campus Karte</h3>
+                        <p>Interaktive Campuskarte der Hochschule Mainz mit Leaflet.</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://vermka-rheinpfalz.rlp.de/fileadmin/lvermgeo/images/Logo_VermKV.jpg" alt="VermKV Rheinland-Pfalz">
+                    <div class="card-content">
+                        <h3>VermKV Rheinland-Pfalz</h3>
+                        <p><a href="https://lvermgeo.rlp.de/de/ueber-uns/vermessungs-und-katasterverwaltung/">Dualer Ausbildungspartner und zukünftiger Arbeitgeber in der Vermessungs- und Katasterverwaltung Rheinland-Pfalz.</a></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+            </div>
+        </div>
+    </main>
+    <script>
+        // Warte bis das Dokument geladen ist
+        document.addEventListener('DOMContentLoaded', function() {
+            // Koordinaten der Hochschule Mainz (Lucy-Hillebrand-Straße 2)
+            const hsMainz = [49.9470, 8.2564];
+            
+            // Initialisiere die Karte
+            const map = L.map('mainz-map').setView(hsMainz, 15);
+            
+            // Füge OpenStreetMap-Layer hinzu
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Füge Marker für die HS Mainz hinzu
+            L.marker(hsMainz)
+                .addTo(map)
+                .bindPopup('Hochschule Mainz<br>Lucy-Hillebrand-Straße 2');
+        });
+    </script>
+</body>
+</html>
