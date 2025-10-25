@@ -13,10 +13,27 @@
     <style>
         :root {
             --primary-color: #2c3e50;
-            --secondary-color: #3498db;
+            --secondary-color: #5886dc;
             --background-color: #f8f9fa;
             --text-color: #333;
             --card-background: #ffffff;
+            --muted: #6b7280;
+        }
+
+        /* Dark theme overrides: white backgrounds -> near-black; text -> light for readability.
+           Note: header stays blue with white text as requested. */
+        .dark-theme {
+            /* keep primary blue for header */
+            --primary-color: #2c3e50;
+            --secondary-color: #5886dc;
+            /* page backgrounds become near-black */
+            --background-color: #000000;
+            /* readable light text on dark backgrounds */
+            --text-color: #eef6ff;
+            /* cards and tables use slightly lighter black */
+            --card-background: #0b0b0b;
+            --muted: #9aa6b2;
+            --border: rgba(255,255,255,0.06);
         }
 
         * {
@@ -40,55 +57,75 @@
 
         header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 1.5rem;
             background-color: var(--primary-color);
             color: white;
-            padding: 2rem;
+            padding: 1.15rem 0; /* etwas breiter */
         }
 
         .header-content {
             display: flex;
             align-items: center;
-            gap: 2rem;
+            gap: 1.5rem;
             max-width: 1200px;
             margin: 0 auto;
+            padding: 0 1.5rem;
         }
 
         .header-text {
             flex: 1;
             text-align: left;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-            }
-            .header-text {
-                text-align: center;
-            }
-        }
-
-        .content-wrapper {
             display: flex;
-            gap: 3rem;
-            align-items: flex-start;
-            padding-top: 2rem;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header-text h1 { font-size: 1.75rem; line-height: 1.2; margin: 0; }
+        .header-text p { font-size: 1rem; opacity: 0.95; margin: 0; }
+
+        /* Theme toggle button (pill) */
+        #theme-toggle {
+            background: rgba(255,255,255,0.12);
+            color: white;
+            border: none;
+            padding: 0.45rem 0.6rem;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            transition: transform 140ms ease, box-shadow 140ms ease, background-color 160ms ease;
+        }
+
+        #theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+        }
+
+        #theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            display: block;
+        }
+
+          /* Show moon icon by default (light mode shows moon to switch to dark),
+              and show sun in dark-theme (to switch to light).
+              Use ID-qualified selectors with !important to override earlier #theme-toggle svg rules. */
+          #theme-toggle .icon-sun { display: none !important; }
+          #theme-toggle .icon-moon { display: inline-block !important; }
+          .dark-theme #theme-toggle .icon-sun { display: inline-block !important; }
+          .dark-theme #theme-toggle .icon-moon { display: none !important; }
+
+        /* Button appearance in dark-theme: light pill for contrast on dark background */
+        .dark-theme #theme-toggle {
+            background: rgba(255,255,255,0.95);
+            color: #0b1622;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.35);
         }
 
         .main-content {
             flex: 1;
-        }
-
-        .sidebar {
-            width: 300px;
-            flex-shrink: 0;
-            position: sticky;
-            top: 2rem;
         }
 
         main {
@@ -111,14 +148,8 @@
             margin-bottom: 2rem;
         }
 
-        @media (max-width: 1024px) {
-            .content-wrapper {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-            }
-        }
+        .tab-panel > section:first-of-type { margin-top: 0; }
+        .tab-panel > section:first-of-type h2 { margin-top: 0; }
 
         /* Tabellenstil */
         table {
@@ -143,22 +174,67 @@
             background-color: #f2f2f2;
         }
 
-        /* Profilbild */
-        .profile-image {
-            max-width: 300px;
-            width: 100%;
-            display: block;
-            border-radius: 8px;
+        /* dark-mode table and row overrides */
+        /* blue-tinted alternating rows */
+        /* stronger blue-tinted alternating rows */
+        .dark-theme tr:nth-child(even) {
+            background-color: rgba(102,163,255,0.16); /* much stronger blue */
+        }
+        .dark-theme tr:nth-child(odd) {
+            background-color: rgba(102,163,255,0.08);
         }
 
-        figure {
-            text-align: center;
-            margin: 0;
+        .dark-theme th, .dark-theme td {
+            border-color: var(--border);
         }
 
-        figcaption {
-            margin-top: 0.5rem;
-            color: var(--primary-color);
+        /* stronger separation in dark mode for rows and columns */
+        .dark-theme th, .dark-theme td {
+            border-left: 1px solid rgba(102,163,255,0.22);
+            border-right: 1px solid rgba(102,163,255,0.12);
+        }
+
+        .dark-theme tbody tr {
+            transition: background-color 140ms ease-in-out;
+        }
+
+        .dark-theme tbody tr:hover {
+            background-color: rgba(102,163,255,0.24);
+        }
+
+        /* stronger divider under header */
+        .dark-theme thead th {
+            box-shadow: inset 0 -3px 0 rgba(102,163,255,0.24);
+        }
+
+        /* make header stand out a bit more */
+        .dark-theme th {
+            /* keep table header blue (same as page header) with white text */
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* body uses CSS variables; explicit .dark-theme body override not needed */
+
+        .dark-theme .card {
+            background-color: var(--card-background);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+        }
+
+        /* project card text area uses header-blue with white text in dark mode */
+        .dark-theme .card .card-content {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 1.25rem;
+        }
+
+        .dark-theme .card .card-content a {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .dark-theme table {
+            background-color: var(--card-background);
         }
 
         /* Galerie */
@@ -167,6 +243,8 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 2rem;
             margin: 2rem 0;
+            align-items: stretch;
+            grid-auto-rows: 1fr; /* make rows equal height */
         }
 
         .card {
@@ -175,6 +253,8 @@
             overflow: hidden;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
 
         .card:hover {
@@ -183,8 +263,9 @@
 
         .card img {
             width: 100%;
-            height: 200px;
+            height: 180px;
             object-fit: cover;
+            flex-shrink: 0;
         }
 
         .map-container {
@@ -194,6 +275,7 @@
 
         .card-content {
             padding: 1.5rem;
+            flex: 1 1 auto;
         }
 
         .card h3 {
@@ -201,12 +283,74 @@
             margin-bottom: 0.5rem;
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .gallery {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        /* dark-mode project titles white */
+        .dark-theme .card h3 {
+            color: #ffffff;
         }
+
+        /* Tab panels */
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Stack news cards vertically */
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        /* Horizontal card layout for News: image left, content right */
+        .news-card {
+            display: flex;
+            flex-direction: row;
+        }
+        .news-card img {
+            width: 220px;
+            height: 220px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .news-card .card-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .news-date {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .news-list .card-content p { margin-bottom: 0; line-height: 1.6; }
+
+        .loading {
+            text-align: center;
+            color: var(--muted);
+            padding: 2rem;
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* Dark mode news styling */
+        .dark-theme .news-card { background-color: var(--card-background); box-shadow: 0 2px 8px rgba(0,0,0,0.6); }
+        .dark-theme .news-card h3 { color: var(--secondary-color); }
 
         @media (max-width: 480px) {
             .gallery {
@@ -221,120 +365,469 @@
                 padding: 0.5rem;
             }
         }
+        /* tab buttons styled like the theme-toggle (pill) and vertically aligned */
+        .simple-tabs {
+            display: flex;
+            gap: 0.6rem;
+            margin-left: 0;
+            align-items: center;
+        }
+
+        /* Gruppe für Tabs + Theme-Button rechts, zentriert zueinander */
+        .header-actions {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .header-actions .simple-tabs { margin-left: 0; }
+
+        .simple-tabs button {
+            background: rgba(255,255,255,0.12);
+            color: white;
+            border: none;
+            padding: 0.45rem 0.8rem;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            transition: transform 140ms ease, box-shadow 140ms ease, background-color 160ms ease;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .simple-tabs button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+        }
+
+        .simple-tabs button.active {
+            background: var(--secondary-color);
+            color: white;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.14);
+        }
+
+        /* Dark-theme: buttons use black background with white text; active remains blue */
+        .dark-theme .simple-tabs button {
+            background: #000000;
+            color: #ffffff;
+            box-shadow: none;
+        }
+
+        .dark-theme .simple-tabs button.active {
+            background: var(--secondary-color);
+            color: #ffffff;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.24);
+        }
+
+        /* About Intro: Bild links, Text rechts */
+        .about-intro {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .about-intro img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .about-intro .about-text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Text vertikal mittig zum Bild */
+            gap: 0.6rem;
+        }
+        .about-intro .about-text p { margin: 0; }
+
+        /* Contact buttons (bottom-right) */
+        .contact-fab {
+            position: fixed;
+            right: 0.75rem;
+            bottom: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 999;
+        }
+        .contact-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-color);
+            color: #ffffff;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+        }
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            background: var(--secondary-color);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.24);
+        }
+        .contact-btn:active { transform: translateY(0); }
+        .contact-btn:focus-visible {
+            outline: 3px solid var(--secondary-color);
+            outline-offset: 2px;
+        }
+        .contact-btn svg { width: 18px; height: 18px; display: block; }
+        .dark-theme .contact-btn { background: var(--primary-color); color: #ffffff; }
+
+        /* Responsive breakpoints */
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; }
+            .header-text { text-align: center; }
+            .gallery { grid-template-columns: repeat(2, 1fr); }
+            .news-card { flex-direction: column; }
+            .news-card img { width: 100%; height: 180px; }
+            .about-intro { flex-direction: column; align-items: flex-start; }
+            .about-intro img { width: 160px; height: 160px; }
+        }
+
+        @media (max-width: 480px) {
+            .gallery { grid-template-columns: 1fr; }
+            table { font-size: 0.9rem; }
+            th, td { padding: 0.5rem; }
+            .contact-fab { right: 0.5rem; bottom: 0.5rem; gap: 0.4rem; }
+            .contact-btn { width: 36px; height: 36px; }
+            .contact-btn svg { width: 16px; height: 16px; }
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="header-content">
-            <figure class="profile-image">
-                <img src="assets/me.jpg" alt="Profilbild" style="width: 200px; height: 200px; object-fit: cover; border-radius: 50%;">
-            </figure>
             <div class="header-text">
                 <h1>Jule Grabis</h1>
                 <p>Geoinformatik-Studentin</p>
+            </div>
+            <div class="header-actions">
+                <div class="simple-tabs" role="tablist" aria-label="Seitenbereiche">
+                    <button id="btn-about" class="active" role="tab" aria-selected="true" aria-controls="content-about" tabindex="0">About</button>
+                    <button id="btn-news" role="tab" aria-selected="false" aria-controls="content-news" tabindex="-1">News</button>
+                    <button id="btn-projects" role="tab" aria-selected="false" aria-controls="content-projects" tabindex="-1">Projects</button>
+                </div>
+                <button id="theme-toggle" aria-label="Theme wechseln" title="Theme wechseln">
+                    <!-- sun icon -->
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="M4.93 4.93l1.41 1.41"></path><path d="M17.66 17.66l1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="M4.93 19.07l1.41-1.41"></path><path d="M17.66 6.34l1.41-1.41"></path></svg>
+                    <!-- moon icon -->
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
             </div>
         </div>
     </header>
 
     <main class="container">
         <div class="main-content">
+            <!-- About Tab Panel -->
+            <div id="content-about" class="tab-panel active" role="tabpanel" aria-labelledby="btn-about" tabindex="0">
                 <section>
-                    <p>Willkommen auf meiner persönlichen Webseite! Ich studiere Geoinformatik und Vermessung im 5. Semester an der Hochschule Mainz.
-                        Mein Studium kombiniere ich mit der Arbeit in der Katasterverwaltung Rheinland-Pfalz – 
-                        so kann ich Theorie und Praxis direkt miteinander verbinden.</p>
-                    <p>Mich begeistert, wie digitale Karten, offene Geodaten und WebGIS dazu beitragen,
-                        unsere Welt transparenter und besser verständlich zu machen.</p>
+                    <div class="about-intro">
+                        <img src="assets/me.jpg" alt="Profilbild von Jule Grabis">
+                        <div class="about-text">
+                            <p>Willkommen auf meiner persönlichen Webseite! Ich studiere Geoinformatik und Vermessung im 5. Semester an der Hochschule Mainz.
+                                Mein Studium kombiniere ich mit der Arbeit in der Katasterverwaltung Rheinland-Pfalz – 
+                                so kann ich Theorie und Praxis direkt miteinander verbinden.</p>
+                            <p>Mich begeistert, wie digitale Karten, offene Geodaten und WebGIS dazu beitragen,
+                                unsere Welt transparenter und besser verständlich zu machen.</p>
+                        </div>
+                    </div>
                 </section>
 
                 <section>
                     <h2>Mein Werdegang</h2>
                     <table>
-                <thead>
-                    <tr>
-                        <th>Jahr</th>
-                        <th>Station</th>
-                        <th>Ort</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Oktober 2026</td>
-                        <td>Studien- und Ausbildungsabschluss</td>
-                        <td>VermKV Koblenz</td>
-                    </tr>
-        
-                    <tr>
-                        <td>Oktober 2023</td>
-                        <td>Studienstart</td>
-                        <td>HS Mainz</td>
-                    </tr>
-                    <tr>
-                        <td>September 2023</td>
-                        <td>Ausbildungsstart</td>
-                        <td>VermKV Koblenz</td>
-                    </tr>
-                    <tr>
-                        <td>Sommer 2023</td>
-                        <td>Vorpraktikum</td>
-                        <td>VermKA Mayen</td>
-                    </tr>
-                    <tr>
-                        <td>März 2023</td>
-                        <td>Abitur</td>
-                        <td>IGS Polch</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
+                        <thead>
+                            <tr>
+                                <th>Jahr</th>
+                                <th>Station</th>
+                                <th>Ort</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Oktober 2026</td>
+                                <td>Studien- und Ausbildungsabschluss</td>
+                                <td>VermKV Koblenz</td>
+                            </tr>
+                            <tr>
+                                <td>Oktober 2023</td>
+                                <td>Studienstart</td>
+                                <td>HS Mainz</td>
+                            </tr>
+                            <tr>
+                                <td>September 2023</td>
+                                <td>Ausbildungsstart</td>
+                                <td>VermKV Koblenz</td>
+                            </tr>
+                            <tr>
+                                <td>Sommer 2023</td>
+                                <td>Vorpraktikum</td>
+                                <td>VermKA Mayen</td>
+                            </tr>
+                            <tr>
+                                <td>März 2023</td>
+                                <td>Abitur</td>
+                                <td>IGS Polch</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
 
+            <!-- News Tab Panel -->
+            <div id="content-news" class="tab-panel" role="tabpanel" aria-labelledby="btn-news" tabindex="0">
+                <section>
+                    <h2>News</h2>
+                    <div id="news-container" class="news-list">
+                        <p class="loading">Lade Neuigkeiten...</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Projects Tab Panel -->
+            <div id="content-projects" class="tab-panel" role="tabpanel" aria-labelledby="btn-projects" tabindex="0">
                 <section>
                     <h2>Projekte</h2>
-            <div class="gallery">
-                <div class="card">
-                    <img src="https://images.pexels.com/photos/3861940/pexels-photo-3861940.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Geoinformatik und Vermessung">
-                    <div class="card-content">
-                        <h3>Geoinformatik & Vermessung</h3>
-                        <p><a href="https://www.hs-mainz.de/studium/studiengaenge/technik/geoinformatik-bsc-kombinierter-studiengang/uebersicht/">Dualer Studiengang an der Hochschule Mainz in Kooperation mit der Vermessungs- und Katasterverwaltung.</a></p>
+                    <div class="gallery">
+                        <div class="card">
+                            <img src="https://images.pexels.com/photos/3861940/pexels-photo-3861940.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Geoinformatik und Vermessung">
+                            <div class="card-content">
+                                <h3>Geoinformatik & Vermessung</h3>
+                                <p><a href="https://www.hs-mainz.de/studium/studiengaenge/technik/geoinformatik-bsc-kombinierter-studiengang/uebersicht/">Dualer Studiengang an der Hochschule Mainz in Kooperation mit der Vermessungs- und Katasterverwaltung.</a></p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div id="mainz-map" class="map-container"></div>
+                            <div class="card-content">
+                                <h3>Campus Karte</h3>
+                                <p>Interaktive Campuskarte der Hochschule Mainz mit Leaflet.</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <img src="https://vermka-rheinpfalz.rlp.de/fileadmin/lvermgeo/images/Logo_VermKV.jpg" alt="VermKV Rheinland-Pfalz">
+                            <div class="card-content">
+                                <h3>VermKV Rheinland-Pfalz</h3>
+                                <p><a href="https://lvermgeo.rlp.de/de/ueber-uns/vermessungs-und-katasterverwaltung/">Dualer Ausbildungspartner und zukünftiger Arbeitgeber in der Vermessungs- und Katasterverwaltung Rheinland-Pfalz.</a></p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="card">
-                    <div id="mainz-map" class="map-container"></div>
-                    <div class="card-content">
-                        <h3>Campus Karte</h3>
-                        <p>Interaktive Campuskarte der Hochschule Mainz mit Leaflet.</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://vermka-rheinpfalz.rlp.de/fileadmin/lvermgeo/images/Logo_VermKV.jpg" alt="VermKV Rheinland-Pfalz">
-                    <div class="card-content">
-                        <h3>VermKV Rheinland-Pfalz</h3>
-                        <p><a href="https://lvermgeo.rlp.de/de/ueber-uns/vermessungs-und-katasterverwaltung/">Dualer Ausbildungspartner und zukünftiger Arbeitgeber in der Vermessungs- und Katasterverwaltung Rheinland-Pfalz.</a></p>
-                    </div>
-                </div>
-            </div>
-        </section>
+                </section>
             </div>
         </div>
     </main>
+    <!-- Kontakt: GitHub und E-Mail (unten rechts) -->
+    <div class="contact-fab" aria-label="Kontakt">
+        <a class="contact-btn" href="https://github.com/Jules0603" target="_blank" rel="noopener noreferrer" aria-label="GitHub: Jules0603" title="GitHub: Jules0603">
+            <!-- GitHub Icon -->
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.11.79-.25.79-.56 0-.27-.01-1.16-.02-2.1-3.22.7-3.9-1.36-3.9-1.36-.53-1.36-1.3-1.72-1.3-1.72-1.06-.73.08-.72.08-.72 1.18.09 1.8 1.22 1.8 1.22 1.04 1.79 2.73 1.27 3.4.97.11-.77.41-1.27.75-1.56-2.57-.29-5.27-1.28-5.27-5.68 0-1.25.45-2.27 1.2-3.07-.12-.29-.52-1.45.11-3.02 0 0 .98-.31 3.2 1.17a11.1 11.1 0 0 1 5.82 0c2.22-1.48 3.2-1.17 3.2-1.17.63 1.57.23 2.73.11 3.02.75.8 1.2 1.82 1.2 3.07 0 4.41-2.7 5.38-5.28 5.66.42.37.8 1.1.8 2.22 0 1.6-.01 2.89-.01 3.28 0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/>
+            </svg>
+        </a>
+        <a class="contact-btn" href="mailto:jule.grabis@students.hs-mainz.de" aria-label="E-Mail an jule.grabis@students.hs-mainz.de" title="E-Mail senden">
+            <!-- Mail Icon -->
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5-8-5V6l8 5 8-5v2Z"/>
+            </svg>
+        </a>
+    </div>
     <script>
-        // Warte bis das Dokument geladen ist
-        document.addEventListener('DOMContentLoaded', function() {
-            // Koordinaten der Hochschule Mainz (Lucy-Hillebrand-Straße 2)
+        // Theme toggle: init from localStorage or system preference
+        (function() {
+            const root = document.documentElement;
+            const toggle = document.getElementById('theme-toggle');
+            const storageKey = 'site-theme';
+
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    root.classList.add('dark-theme');
+                } else {
+                    root.classList.remove('dark-theme');
+                }
+                // update button label/title to indicate the target mode
+                if (toggle) {
+                    if (theme === 'dark') {
+                        toggle.setAttribute('aria-label', 'Wechsel zu Lightmode');
+                        toggle.setAttribute('title', 'Wechsel zu Lightmode');
+                    } else {
+                        toggle.setAttribute('aria-label', 'Wechsel zu Nightmode');
+                        toggle.setAttribute('title', 'Wechsel zu Nightmode');
+                    }
+                }
+            }
+
+            // Determine initial theme
+            const stored = localStorage.getItem(storageKey);
+            if (stored) {
+                applyTheme(stored);
+            } else {
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                applyTheme(prefersDark ? 'dark' : 'light');
+            }
+
+            // Toggle handler
+            if (toggle) {
+                toggle.addEventListener('click', function() {
+                    const isDark = root.classList.contains('dark-theme');
+                    const next = isDark ? 'light' : 'dark';
+                    applyTheme(next);
+                    localStorage.setItem(storageKey, next);
+                });
+            }
+        })();
+
+        // Leaflet Map: lazy initialization when Projects tab becomes active
+        let __mapInitialized = false;
+        function initMainzMap() {
+            if (__mapInitialized) return;
+            const container = document.getElementById('mainz-map');
+            if (!container) return;
             const hsMainz = [49.9470, 8.2564];
-            
-            // Initialisiere die Karte
-            const map = L.map('mainz-map').setView(hsMainz, 15);
-            
-            // Füge OpenStreetMap-Layer hinzu
+            const map = L.map(container).setView(hsMainz, 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
-            
-            // Füge Marker für die HS Mainz hinzu
             L.marker(hsMainz)
                 .addTo(map)
                 .bindPopup('Hochschule Mainz<br>Lucy-Hillebrand-Straße 2');
-        });
+            // store reference for invalidateSize after panel becomes visible
+            window.__mainzMap = map;
+            __mapInitialized = true;
+            // ensure proper sizing after render
+            setTimeout(() => map.invalidateSize(), 60);
+        }
+
+        // Tab functionality
+        (function() {
+            const tabs = Array.from(document.querySelectorAll('.simple-tabs [role="tab"]'));
+            if (!tabs.length) return;
+
+            function setActive(clicked, focusTab = false) {
+                // Update button states
+                tabs.forEach(t => {
+                    const isActive = t === clicked;
+                    t.classList.toggle('active', isActive);
+                    t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                    t.setAttribute('tabindex', isActive ? '0' : '-1');
+                });
+
+                // Update content panels
+                const targetId = clicked.id.replace('btn-', 'content-');
+                document.querySelectorAll('.tab-panel').forEach(panel => {
+                    panel.classList.toggle('active', panel.id === targetId);
+                });
+
+                // If Projects tab becomes active, initialize map lazily
+                if (targetId === 'content-projects') {
+                    initMainzMap();
+                    // Invalidate size after becoming visible
+                    setTimeout(() => { if (window.__mainzMap) window.__mainzMap.invalidateSize(); }, 80);
+                }
+
+                if (focusTab) {
+                    clicked.focus();
+                }
+                // header bleibt auf allen Tabs gleich – kein Profilbild im Header
+            }
+
+            tabs.forEach(t => t.addEventListener('click', () => setActive(t)));
+
+            // Keyboard navigation for tabs (ArrowLeft/Right, Home/End, Enter/Space)
+            tabs.forEach((t, idx) => {
+                t.addEventListener('keydown', (e) => {
+                    const key = e.key;
+                    let nextIndex = null;
+                    if (key === 'ArrowRight') { nextIndex = (idx + 1) % tabs.length; }
+                    else if (key === 'ArrowLeft') { nextIndex = (idx - 1 + tabs.length) % tabs.length; }
+                    else if (key === 'Home') { nextIndex = 0; }
+                    else if (key === 'End') { nextIndex = tabs.length - 1; }
+                    else if (key === 'Enter' || key === ' ') { e.preventDefault(); setActive(t, true); return; }
+                    if (nextIndex !== null) {
+                        e.preventDefault();
+                        tabs[nextIndex].focus();
+                    }
+                });
+            });
+
+            // If projects panel is active on load (unlikely), init map
+            const projectsPanel = document.getElementById('content-projects');
+            if (projectsPanel && projectsPanel.classList.contains('active')) {
+                initMainzMap();
+            }
+        })();
+
+        // Load news dynamically from JSON
+        (function() {
+            const newsContainer = document.getElementById('news-container');
+            if (!newsContainer) return;
+
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return '';
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return date.toLocaleDateString('de-DE', options);
+            }
+
+            function escapeHtml(str) {
+                return String(str || '').replace(/[&<>"]+/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
+            }
+
+            function createNewsItem(item) {
+                const title = escapeHtml(item.title || 'Ohne Titel');
+                const dateText = formatDate(item.date);
+                const desc = escapeHtml(item.description || item.summary || '');
+                const hasImage = !!item.image;
+                const link = item.link && typeof item.link === 'string' ? item.link : null;
+
+                const card = document.createElement('div');
+                card.className = 'card news-card';
+
+                const titleHtml = link ? `<a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a>` : title;
+                const dateHtml = dateText ? `<p class="news-date">${dateText}</p>` : '';
+                const imageHtml = hasImage ? `<img src="${item.image}" alt="${title}">` : '';
+
+                card.innerHTML = `
+                    ${imageHtml}
+                    <div class="card-content">
+                        <h3>${titleHtml}</h3>
+                        ${dateHtml}
+                        <p>${desc}</p>
+                    </div>
+                `;
+                return card;
+            }
+
+            fetch('assets/news.json')
+                .then(r => {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(json => {
+                    newsContainer.innerHTML = '';
+                    const items = Array.isArray(json) ? json : (Array.isArray(json.news) ? json.news : []);
+                    if (!items.length) {
+                        newsContainer.innerHTML = '<p class="loading">Keine Neuigkeiten verfügbar.</p>';
+                        return;
+                    }
+                    items
+                        .slice()
+                        .sort((a, b) => new Date(b.date) - new Date(a.date))
+                        .forEach(item => newsContainer.appendChild(createNewsItem(item)));
+                })
+                .catch(err => {
+                    console.error('Fehler beim Laden der News:', err);
+                    newsContainer.innerHTML = '<p class="error">News konnten nicht geladen werden. Bitte versuchen Sie es später erneut.</p>';
+                });
+        })();
     </script>
 </body>
 </html>
