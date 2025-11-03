@@ -240,7 +240,7 @@
         /* Galerie */
         .gallery {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 2rem;
             margin: 2rem 0;
             align-items: stretch;
@@ -271,6 +271,13 @@
         .map-container {
             width: 100%;
             height: 200px;
+        }
+
+        .map-embed {
+            width: 100%;
+            height: 300px;
+            border: 0;
+            display: block;
         }
 
         .card-content {
@@ -599,24 +606,31 @@
                     <h2>Projekte</h2>
                     <div class="gallery">
                         <div class="card">
-                            <img src="https://images.pexels.com/photos/3861940/pexels-photo-3861940.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Geoinformatik und Vermessung">
+                            <iframe class="map-embed" src="03/map_2_punkte.html" title="Persönliche Orte: Mainz, Polch, Düren" loading="eager"></iframe>
                             <div class="card-content">
-                                <h3>Geoinformatik & Vermessung</h3>
-                                <p><a href="https://www.hs-mainz.de/studium/studiengaenge/technik/geoinformatik-bsc-kombinierter-studiengang/uebersicht/">Dualer Studiengang an der Hochschule Mainz in Kooperation mit der Vermessungs- und Katasterverwaltung.</a></p>
+                                <h3>Meine Orte</h3>
+                                <p>Interaktive Folium-Karte mit drei persönlichen Orten: Mainz (Studienort), Polch (Wohnort) und Düren (Geburtsort).</p>
                             </div>
                         </div>
                         <div class="card">
-                            <div id="mainz-map" class="map-container"></div>
+                            <iframe class="map-embed" src="03/map_3_reiseroute.html" title="Reiseroute Portugal" loading="eager"></iframe>
                             <div class="card-content">
-                                <h3>Campus Karte</h3>
-                                <p>Interaktive Campuskarte der Hochschule Mainz mit Leaflet.</p>
+                                <h3>Portugal Reiseroute</h3>
+                                <p>Nummerierte Reiseroute durch Portugal: Porto → Coimbra → Lissabon mit Polyline und Markern.</p>
                             </div>
                         </div>
                         <div class="card">
-                            <img src="https://vermka-rheinpfalz.rlp.de/fileadmin/lvermgeo/images/Logo_VermKV.jpg" alt="VermKV Rheinland-Pfalz">
+                            <iframe class="map-embed" src="03/map_4_flaechen_online.html" title="Besuchte Länder Weltkarte" loading="eager"></iframe>
                             <div class="card-content">
-                                <h3>VermKV Rheinland-Pfalz</h3>
-                                <p><a href="https://lvermgeo.rlp.de/de/ueber-uns/vermessungs-und-katasterverwaltung/">Dualer Ausbildungspartner und zukünftiger Arbeitgeber in der Vermessungs- und Katasterverwaltung Rheinland-Pfalz.</a></p>
+                                <h3>Besuchte Länder</h3>
+                                <p>Weltkarte mit hervorgehobenen besuchten Ländern (GeoJSON): USA, Kanada, Deutschland, Niederlande, Belgien, Frankreich, Spanien, Portugal, Kroatien, Slowenien, UK.</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <iframe class="map-embed" src="03/map_5_3d.html" title="3D-Gebäude LoD2 mit Cesium" loading="eager"></iframe>
+                            <div class="card-content">
+                                <h3>3D-Gebäude (LoD2)</h3>
+                                <p>Interaktive 3D-Karte mit Cesium: LoD2-Gebäude aus dem deutschen Basemap mit individuell eingefärbten Dächern und Wänden.</p>
                             </div>
                         </div>
                     </div>
@@ -709,6 +723,7 @@
         (function() {
             const tabs = Array.from(document.querySelectorAll('.simple-tabs [role="tab"]'));
             if (!tabs.length) return;
+            const TAB_STORAGE_KEY = 'active-tab';
 
             function setActive(clicked, focusTab = false) {
                 // Update button states
@@ -725,11 +740,26 @@
                     panel.classList.toggle('active', panel.id === targetId);
                 });
 
+                // Save active tab to localStorage
+                localStorage.setItem(TAB_STORAGE_KEY, clicked.id);
+
                 // If Projects tab becomes active, initialize map lazily
                 if (targetId === 'content-projects') {
                     initMainzMap();
                     // Invalidate size after becoming visible
                     setTimeout(() => { if (window.__mainzMap) window.__mainzMap.invalidateSize(); }, 80);
+                    // Force-refresh Folium iframes once when first shown to fix Leaflet sizing in hidden containers
+                    (function refreshProjectIframesOnce() {
+                        const iframes = document.querySelectorAll('#content-projects iframe.map-embed');
+                        const ts = Date.now();
+                        iframes.forEach((iframe) => {
+                            if (iframe.dataset.refreshed === 'true') return;
+                            const src = iframe.getAttribute('src') || '';
+                            const base = src.split('?')[0];
+                            iframe.setAttribute('src', base + (base.includes('?') ? '&' : '?') + 'v=' + ts);
+                            iframe.dataset.refreshed = 'true';
+                        });
+                    })();
                 }
 
                 if (focusTab) {
@@ -739,6 +769,13 @@
             }
 
             tabs.forEach(t => t.addEventListener('click', () => setActive(t)));
+
+            // Restore active tab from localStorage on page load
+            const savedTabId = localStorage.getItem(TAB_STORAGE_KEY);
+            const savedTab = savedTabId ? document.getElementById(savedTabId) : null;
+            if (savedTab && tabs.includes(savedTab)) {
+                setActive(savedTab);
+            }
 
             // Keyboard navigation for tabs (ArrowLeft/Right, Home/End, Enter/Space)
             tabs.forEach((t, idx) => {
